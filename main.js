@@ -1,19 +1,22 @@
-window.onload = function() {
-    var game = new Phaser.Game(320, 480, Phaser.CANVAS, 'game-screen', { preload: preload, create: create, update: update });
+window.onload = function () {
+    var game = new Phaser.Game("100%","100%", Phaser.CANVAS, 'game-screen', { preload: preload, create: create, update: update });
 
-    // var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'phaser-example', { create: create, update: update });
 
     function preload() {
-
-        game.load.spritesheet('sheep', 'assets/images/sheep24x30.png', 24, 30);
-
+        game.load.spritesheet('sheep', 'assets/images/sheep32x32.png', 32, 32);
     }
+
     var sheep;
     var burger;
-    var cursors;
-    var sheepFront;
+    var feedAnim;
+    var feedBurger;
 
-    function create() {
+    const WALK = 0;
+    const SLEEP = 1;
+    const EAT = 2;
+    var status;
+
+    function create () {
 
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
@@ -23,13 +26,16 @@ window.onload = function() {
         //  also available in the Phaser Examples repo and on the Phaser site.
         var pixelWidth = 6;
         var pixelHeight = 6;
-        
-        sheep = game.add.sprite(150, 240, 'sheep');
+
+        sheep = game.add.sprite(0, 0, 'sheep');
+        sheep.alignIn(game.world.bounds, Phaser.CENTER, 0, 0);
         sheep.scale.set(3);
         sheep.smoothed = false;
         sheep.anchor.set(0.5);
-        sheep.animations.add('walk');
-        sheep.animations.play('walk', 1, true);
+        sheep.animations.add('walk', [0, 1]);
+        sheep.animations.add('sleep', [2, 3]);
+        feedAnim = sheep.animations.add('eat', [4, 5]);
+        // sheep.animations.play('sleep', 1, true);
 
         game.physics.arcade.enable(sheep);
 
@@ -52,7 +58,8 @@ window.onload = function() {
             '................'
         ];
         game.create.texture('burger', burgerData, pixelWidth, pixelHeight, 0);
-        burger = game.add.sprite(150, 400, 'burger');
+        game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
+        burger = game.add.sprite(150, 400, 'burger').alignIn(game.world.bounds, Phaser.BOTTOM_CENTER);
 
         burger.inputEnabled = true;
         burger.events.onInputDown.add(feed, this);
@@ -77,47 +84,75 @@ window.onload = function() {
         // ];
         // game.create.texture('sheepFront', sheepFrontData, pixelWidth, pixelHeight, 0);
 
-        // cursors = game.input.keyboard.createCursorKeys();
-
-        // // setInterval(function(){}, 200)
-        // game.input.onDown.addOnce(changeMummy, this);
-
-    }
-    function changeMummy() {
-
-        sheep.loadTexture('sheepFront', 0);
     }
 
-    function update() {
-
-        // sheep.body.velocity.x = 0;
-        // sheep.body.velocity.y = 0;
-
-        // if (cursors.left.isDown)
-        // {
-        //     sheep.body.velocity.x = -200;
-        //     sheep.scale.x = 1;
-        // }
-        // else if (cursors.right.isDown)
-        // {
-        //     sheep.body.velocity.x = 200;
-        //     sheep.scale.x = -1;
-        // }
-
-        // if (cursors.up.isDown)
-        // {
-        //     sheep.body.velocity.y = -200;
-        // }
-        // else if (cursors.down.isDown)
-        // {
-        //     sheep.body.velocity.y = 200;
-        // }
-
+    function update () {
+        if (isDaytime()) walk();
+        if (isMealTime()) eat();
+        if (isNightTime()) sleep();
     }
 
-    function feed(burger, pointer) {
-        console.log('feed!');
+    function isNightTime () {
+        const now = new Date();
+        const hours = now.getHours();
+        return hours >= 22 || hours < 9;
     }
 
+    function isDaytime () {
+        const now = new Date();
+        const hours = now.getHours();
+        return !isNightTime() && !isMealTime();
+    }
 
+    function isMealTime () {
+        return isLunchTime() || isDinnerTime();
+    }
+
+    function isLunchTime () {
+        const now = new Date();
+        const hours = now.getHours();
+        return hours >= 12 && hours < 13;
+    }
+
+    function isDinnerTime () {
+        const now = new Date();
+        const hours = now.getHours();
+        return hours >= 6 && hours < 7;
+    }
+
+    function feed (burger, pointer) {
+        if (status !== EAT){
+            feedBurger = game.add.sprite(0, 0, 'burger').alignTo(sheep, Phaser.RIGHT_BOTTOM, -32, 12);
+            feedAnim.onLoop.add(animationLooped, this);
+            feedAnim.play(1, true);
+        }
+    }
+
+    function walk () {
+        if (status !== WALK) {
+            sheep.animations.play('walk', 1, true);
+            status = WALK;
+        }
+    }
+    function eat () {
+        if (status !== EAT) {
+            sheep.animations.play('eat', 1, true);
+            status = EAT;
+        }
+    }
+
+    function animationLooped(sprite, animation) {
+        if (animation.loopCount === 5) {
+            feedBurger.destroy();
+            animation.loop = false;
+            status = null;
+        }
+    }
+
+    function sleep () {
+        if (status !== SLEEP){
+            sheep.animations.play('sleep', 1, true);
+            status = SLEEP;
+        }
+    }
 };
