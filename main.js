@@ -7,6 +7,7 @@ window.onload = function () {
     }
 
     var sheep;
+    var book;
     var burger;
     var feedAnim;
     var feedBurger;
@@ -14,6 +15,7 @@ window.onload = function () {
     const WALK = 0;
     const SLEEP = 1;
     const EAT = 2;
+    const READ = 3;
     var status;
 
     function create () {
@@ -35,7 +37,7 @@ window.onload = function () {
         sheep.animations.add('walk', [0, 1]);
         sheep.animations.add('sleep', [2, 3]);
         feedAnim = sheep.animations.add('eat', [4, 5]);
-        // sheep.animations.play('sleep', 1, true);
+        sheep.animations.add('read', [6, 7]);
 
         sheep.inputEnabled = true;
         sheep.events.onInputDown.add(love, this);
@@ -60,7 +62,7 @@ window.onload = function () {
         ];
         game.create.texture('burger', burgerData, pixelWidth, pixelHeight, 0);
         game.scale.fullScreenScaleMode = Phaser.ScaleManager.EXACT_FIT;
-        burger = game.add.sprite(150, 400, 'burger').alignIn(game.world.bounds, Phaser.BOTTOM_CENTER);
+        burger = game.add.sprite(0, 0, 'burger').alignIn(game.world.bounds, Phaser.BOTTOM_CENTER);
 
         burger.inputEnabled = true;
         burger.events.onInputDown.add(feed, this);
@@ -78,7 +80,28 @@ window.onload = function () {
             '............',
             '............'
             ];
-        game.create.texture('heart', heartData, 6, 6, 0);
+        game.create.texture('heart', heartData, pixelWidth, pixelHeight, 0);
+
+        var bookData = [
+            '................',
+            '....EEEEEEE.....',
+            '...E111D111E....',
+            '..E1222D2221E...',
+            'EE12112D21121EE.',
+            'D121222D222121D.',
+            'D122112D211221D.',
+            'D121222D222121D.',
+            'D122112D211221D.',
+            'D121222D222121D.',
+            'D122112D211221D.',
+            'D121222D222121D.',
+            'D122DDDDDDD221D.',
+            'D12D.......D21D.',
+            'D1D.........D1D.',
+            'DD...........DD.'
+        ];
+        game.create.texture('book', bookData, pixelWidth, pixelHeight, 0);
+
         // var sheepFrontData = [
         //     '................',
         //     '.....222222.....',
@@ -98,25 +121,35 @@ window.onload = function () {
         //     '......7..7......'
         // ];
         // game.create.texture('sheepFront', sheepFrontData, pixelWidth, pixelHeight, 0);
+        // sheepFront = game.add.sprite(0, 0, 'sheepFront').alignIn(game.world.bounds, Phaser.BOTTOM_RIGHT);
 
     }
 
     function update () {
-        if (isDaytime()) walk();
-        if (isMealTime()) eat();
-        if (isNightTime()) sleep();
+        if (isDaytime()) {
+            if (isMealTime()) {
+                eat();
+            } else if (isReadTime()) {
+                read();
+            } else {
+                walk();
+            }
+        }
+        else {
+            sleep();
+        }
     }
 
-    function isNightTime () {
+    function isReadTime() {
         const now = new Date();
         const hours = now.getHours();
-        return hours >= 22 || hours < 9;
+        return hours >= 9 && hours < 10 || hours >= 2 && hours < 4;
     }
 
     function isDaytime () {
         const now = new Date();
         const hours = now.getHours();
-        return !isNightTime() && !isMealTime();
+        return hours >= 8 && hours < 22;
     }
 
     function isMealTime () {
@@ -137,35 +170,48 @@ window.onload = function () {
 
     function feed (burger, pointer) {
         if (status !== EAT){
-            feedBurger = game.add.sprite(0, 0, 'burger').alignTo(sheep, Phaser.RIGHT_BOTTOM, -32, 12);
+            feedBurger = game.add.sprite(0, 0, 'burger').alignTo(sheep, Phaser.RIGHT_BOTTOM, -32, 30);
             feedAnim.onLoop.add(animationLooped, this);
             feedAnim.play(1, true);
         }
     }
 
     function love (sheep, pointer) {
-  
         const heart = game.add.sprite(0, 0, 'heart').alignTo(sheep, Phaser.TOP_RIGHT, 16, 0);
         setTimeout(function(){
             heart.destroy();
         }, 1000);
     }
-
+    function cleanItems() {
+        if (status === EAT) {
+            feedBurger.destroy();
+        }
+    }
     function walk () {
         if (status !== WALK) {
+            cleanItems();
             sheep.animations.play('walk', 1, true);
             status = WALK;
         }
     }
     function eat () {
         if (status !== EAT) {
+            feedBurger = game.add.sprite(0, 0, 'burger').alignTo(sheep, Phaser.RIGHT_BOTTOM, -32, 30);
             sheep.animations.play('eat', 1, true);
             status = EAT;
         }
     }
 
+    function read() {
+        if (status !== READ) {
+            book = game.add.sprite(0, 0, 'book').alignTo(sheep, Phaser.TOP_CENTRAL, 0, 0);
+            sheep.animations.play('read', 1, true);
+            status = READ;
+        }
+    }
+
     function animationLooped(sprite, animation) {
-        if (animation.loopCount === 5) {
+        if (animation.loopCount === 3) {
             feedBurger.destroy();
             animation.loop = false;
             status = null;
