@@ -37,7 +37,8 @@ window.onload = function () {
         feedAnim = sheep.animations.add('eat', [4, 5]);
         // sheep.animations.play('sleep', 1, true);
 
-        game.physics.arcade.enable(sheep);
+        sheep.inputEnabled = true;
+        sheep.events.onInputDown.add(love, this);
 
         var burgerData = [
             '................',
@@ -63,7 +64,21 @@ window.onload = function () {
 
         burger.inputEnabled = true;
         burger.events.onInputDown.add(feed, this);
-
+        const heartData = [
+            '............',
+            '..443..443..',
+            '.4444344243.',
+            '444444444243',
+            '444444444443',
+            '.4444444443.',
+            '..44444443..',
+            '...444443...',
+            '....4443....',
+            '.....43.....',
+            '............',
+            '............'
+            ];
+        game.create.texture('heart', heartData, 6, 6, 0);
         // var sheepFrontData = [
         //     '................',
         //     '.....222222.....',
@@ -126,6 +141,14 @@ window.onload = function () {
             feedAnim.onLoop.add(animationLooped, this);
             feedAnim.play(1, true);
         }
+    }
+
+    function love (sheep, pointer) {
+  
+        const heart = game.add.sprite(0, 0, 'heart').alignTo(sheep, Phaser.TOP_RIGHT, 16, 0);
+        setTimeout(function(){
+            heart.destroy();
+        }, 1000);
     }
 
     function walk () {
