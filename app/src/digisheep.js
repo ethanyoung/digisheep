@@ -3,7 +3,7 @@ window.onload = function () {
 
 
     function preload() {
-        game.load.spritesheet('sheep', 'assets/images/sheep32x32.png', 32, 32);
+        game.load.spritesheet('sheep', 'app/assets/images/sheep32x32.png', 32, 32);
     }
 
     var sheep;
