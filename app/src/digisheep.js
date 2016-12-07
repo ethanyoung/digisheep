@@ -1,6 +1,7 @@
+/*jshint esversion: 6 */
+
 window.onload = function () {
     var game = new Phaser.Game("100%","100%", Phaser.CANVAS, 'game-screen', { preload: preload, create: create, update: update });
-
 
     function preload() {
         game.load.spritesheet('sheep', 'app/assets/images/sheep32x32.png', 32, 32);
