@@ -5,9 +5,11 @@ window.onload = function () {
 
     function preload() {
         game.load.spritesheet('sheep', 'app/assets/images/sheep32x32.png', 32, 32);
+        game.load.audio('mie', 'app/assets/audio/sheep_voice.wav');
     }
 
     var sheep;
+    var mie;
     var book;
     var burger;
     var feedAnim;
@@ -42,6 +44,8 @@ window.onload = function () {
 
         sheep.inputEnabled = true;
         sheep.events.onInputDown.add(love, this);
+
+        mie = game.add.audio('mie');
 
         var burgerData = [
             '................',
@@ -178,6 +182,8 @@ window.onload = function () {
     }
 
     function love (sheep, pointer) {
+        console.log('love');
+        mie.play();
         const heart = game.add.sprite(0, 0, 'heart').alignTo(sheep, Phaser.TOP_RIGHT, 16, 0);
         setTimeout(function(){
             heart.destroy();
