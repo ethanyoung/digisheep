@@ -1,7 +1,7 @@
 # digisheep
 [![Built with Grunt](https://cdn.gruntjs.com/builtwith.png)](http://gruntjs.com/)
 
-[Play it here!](ethanyoung.github.io/digisheep)
+[Play it here!](https://ethanyoung.github.io/digisheep/)
 
 [Tamagotchi](https://en.wikipedia.org/wiki/Tamagotchi)-like web game.
 
