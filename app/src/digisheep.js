@@ -25,10 +25,10 @@ window.onload = function () {
     var status;
 
     function create () {
-
         game.physics.startSystem(Phaser.Physics.ARCADE);
 
         game.stage.backgroundColor = '#2d2d2d';
+        game.stage.disableVisibilityChange = true;
 
         //  This sprite was created with the Phaser Gen Paint app
         //  also available in the Phaser Examples repo and on the Phaser site.
