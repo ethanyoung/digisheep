@@ -7,6 +7,7 @@ window.onload = function () {
         game.load.spritesheet('sheep', 'app/assets/images/sheep32x32.png', 32, 32);
         game.load.spritesheet('burger', 'app/assets/images/burger32x32.png', 32, 32);
         game.load.spritesheet('heart', 'app/assets/images/heart32x32.png', 32, 32);
+        game.load.spritesheet('book', 'app/assets/images/book32x32.png', 32, 32);
         game.load.audio('mie', 'app/assets/audio/sheep_voice.wav');
     }
 
@@ -56,26 +57,6 @@ window.onload = function () {
         burger.smoothed = false;
         burger.inputEnabled = true;
         burger.events.onInputDown.add(feed, this);
-
-        var bookData = [
-            '................',
-            '....EEEEEEE.....',
-            '...E111D111E....',
-            '..E1222D2221E...',
-            'EE12112D21121EE.',
-            'D121222D222121D.',
-            'D122112D211221D.',
-            'D121222D222121D.',
-            'D122112D211221D.',
-            'D121222D222121D.',
-            'D122112D211221D.',
-            'D121222D222121D.',
-            'D122DDDDDDD221D.',
-            'D12D.......D21D.',
-            'D1D.........D1D.',
-            'DD...........DD.'
-        ];
-        game.create.texture('book', bookData, pixelWidth, pixelHeight, 0);
 
         // var sheepFrontData = [
         //     '................',
@@ -191,7 +172,11 @@ window.onload = function () {
 
     function read() {
         if (status !== READ) {
-            book = game.add.sprite(0, 0, 'book').alignTo(sheep, Phaser.TOP_CENTRAL, 0, 0);
+            book = game.add.sprite(0, 0, 'book');
+            book.anchor.set(0.5);
+            book.scale.set(3);
+            book.alignTo(sheep, Phaser.TOP_CENTRAL, 0, 0);
+            book.smoothed = false;
             sheep.animations.play('read', 1, true);
             status = READ;
         }
